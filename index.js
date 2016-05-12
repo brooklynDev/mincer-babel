@@ -7,7 +7,7 @@ var path = require('path');
 
 // Second param is not mandatory, used only to force specific
 // module version when nested dependencies cause conflict.
-module.exports = function addBabelEngine(Mincer, babel) {
+module.exports = function addBabelEngine(Mincer, babel, babelOptions) {
 
 	var BabelEngine = Mincer.BabelEngine = function BabelEngine() {
 		Mincer.Template.apply(this, arguments);
@@ -21,11 +21,13 @@ module.exports = function addBabelEngine(Mincer, babel) {
 		var source = this.data;
 		var dir = path.dirname(context.pathname);
 
-		var transformed = babel.transform(source, {
-			sourceMaps: withSourcemap,
-			inputSourceMap: this.map,
-			sourceRoot: path.dirname(context.pathname)
-		});
+		babelOptions = Object.assign({
+					sourceMaps: withSourcemap,
+					inputSourceMap: this.map,
+					sourceRoot: path.dirname(context.pathname)
+				}, babelOptions);
+				
+		var transformed = babel.transform(source, babelOptions);
 
 		this.data = transformed.code;
 
